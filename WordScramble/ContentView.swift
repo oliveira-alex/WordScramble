@@ -16,6 +16,17 @@ struct ContentView: View {
 	@State private var errorMessage = ""
 	@State private var showingError = false
 	
+	var score: Int {
+		var lettersCount = 0
+		
+		for word in usedWords {
+			lettersCount += word.count
+		}
+		
+		return lettersCount
+	}
+	
+	
     var body: some View {
 		NavigationView {
 			VStack {
@@ -28,6 +39,9 @@ struct ContentView: View {
 					Image(systemName: "\($0.count).circle")
 					Text($0)
 				}
+				
+				Text("Score: \(score)")
+					.font(.title)
 			}
 			.navigationBarTitle(rootWord)
 			.navigationBarItems(trailing: Button("Restart") {
