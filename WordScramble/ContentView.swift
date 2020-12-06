@@ -30,12 +30,22 @@ struct ContentView: View {
 				}
 			}
 			.navigationBarTitle(rootWord)
+			.navigationBarItems(trailing: Button("Restart") {
+				self.restartGame()
+			})
 			.onAppear(perform: startGame)
 			.alert(isPresented: $showingError) {
 				Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
 			}
 		}
     }
+	
+	func restartGame() {
+		usedWords.removeAll()
+		newWord = ""
+		
+		startGame()
+	}
 	
 	func addNewWord() {
 		let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
