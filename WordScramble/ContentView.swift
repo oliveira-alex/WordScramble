@@ -42,6 +42,11 @@ struct ContentView: View {
 		
 		guard answer.count > 0 else { return }
 		
+		guard answer != rootWord else {
+			wordError(title: "Same as start word", message: "Be more original")
+			return
+		}
+		
 		guard isOriginal(word: answer) else {
 			wordError(title: "Word used already", message: "Be more original")
 			return
@@ -93,6 +98,8 @@ struct ContentView: View {
 	}
 	
 	func isReal(word: String) -> Bool {
+		guard word.count > 2 else { return false }
+		
 		let checker = UITextChecker()
 		let range = NSRange(location: 0, length: word.utf16.count)
 		let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
@@ -110,5 +117,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+			.environment(\.colorScheme, .dark)
     }
 }
