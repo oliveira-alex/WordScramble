@@ -44,7 +44,7 @@ struct ContentView: View {
 					.font(.title)
 			}
 			.navigationBarTitle(rootWord)
-			.navigationBarItems(trailing: Button("Restart") {
+			.navigationBarItems(trailing: Button("New Word") {
 				self.restartGame()
 			})
 			.onAppear(perform: startGame)
