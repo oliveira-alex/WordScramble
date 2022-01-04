@@ -15,6 +15,10 @@ struct ContentView: View {
 	@State private var errorTitle = ""
 	@State private var errorMessage = ""
 	@State private var showingError = false
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    var startWithExample = false
 	
 	var score: Int {
 		var lettersCount = 0
@@ -37,7 +41,9 @@ struct ContentView: View {
                 
                 GeometryReader { listView in
                     let listWidth = listView.size.width
+                    let listHeight = listView.size.height
                     let listMaxY = listView.frame(in: .global).maxY
+                    let listMinY = listView.frame(in: .global).minY
                     
                     List(usedWords, id: \.self) { word in
                         GeometryReader { listItemView in
@@ -45,11 +51,17 @@ struct ContentView: View {
                             let itemHeight = listItemView.size.height
                             let offScreenItemHeight = (itemMaxY > listMaxY) ? (itemMaxY - listMaxY) : 0
                             
+                            let darkSchemeGreen = 0.2 + 0.8*(itemMaxY - listMinY)/(listHeight + itemHeight) // Varies between 0.2~1.0
+                            let lightSchemeGreen = 1.0 - (darkSchemeGreen) // Varies between 0.8~0.0
+                            
                             HStack {
                                 Spacer()
                                     .frame(width: listWidth * offScreenItemHeight/itemHeight)
                                 
                                 Image(systemName: "\(word.count).circle")
+                                    .foregroundColor(Color(red:  0.3,
+                                                           green: (colorScheme == .dark) ? 2.0*darkSchemeGreen : 1.2*lightSchemeGreen,
+                                                           blue: 2.0))
                                 Text(word)
                             }
                             .accessibilityElement(children: .ignore)
@@ -71,7 +83,7 @@ struct ContentView: View {
                     Button("New Word") { restartGame() }
                 }
             }
-			.onAppear(perform: startGame)
+            .onAppear(perform: startWithExample ? loadExample : startGame)
 			.alert(isPresented: $showingError) {
 				Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
 			}
@@ -171,7 +183,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
-			.environment(\.colorScheme, .dark)
+        ContentView(startWithExample: true)
+//			.environment(\.colorScheme, .dark)
     }
 }
