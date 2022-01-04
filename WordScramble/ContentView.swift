@@ -34,23 +34,43 @@ struct ContentView: View {
 					.textFieldStyle(RoundedBorderTextFieldStyle())
 					.autocapitalization(.none)
 					.padding()
-				
-				List(usedWords, id: \.self) { word in
-                    HStack {
-                        Image(systemName: "\(word.count).circle")
-                        Text(word)
+                
+                GeometryReader { listView in
+                    let listWidth = listView.size.width
+                    let listMaxY = listView.frame(in: .global).maxY
+                    
+                    List(usedWords, id: \.self) { word in
+                        GeometryReader { listItemView in
+                            let itemMaxY = listItemView.frame(in: .global).maxY
+                            let itemHeight = listItemView.size.height
+                            let offScreenItemHeight = (itemMaxY > listMaxY) ? (itemMaxY - listMaxY) : 0
+                            
+                            HStack {
+                                Spacer()
+                                    .frame(width: listWidth * offScreenItemHeight/itemHeight)
+                                
+                                Image(systemName: "\(word.count).circle")
+                                Text(word)
+                            }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(word), \(word.count) letters")
+                        }
                     }
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("\(word), \(word.count) letters")
-				}
+                }
 				
 				Text("Score: \(score)")
 					.font(.title)
 			}
 			.navigationBarTitle(rootWord)
-			.navigationBarItems(trailing: Button("New Word") {
-				self.restartGame()
-			})
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Example") { loadExample() }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("New Word") { restartGame() }
+                }
+            }
 			.onAppear(perform: startGame)
 			.alert(isPresented: $showingError) {
 				Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
@@ -140,6 +160,13 @@ struct ContentView: View {
 		errorMessage = message
 		showingError = true
 	}
+    
+    func loadExample() {
+        usedWords.removeAll()
+        newWord = ""
+        rootWord = "widowing"
+        usedWords = ["ding", "dong", "dig", "now", "wow", "god", "gin", "dog", "own", "dow", "down", "wig", "win", "widow", "wing", "window"]
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
